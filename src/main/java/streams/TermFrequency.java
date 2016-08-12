@@ -15,6 +15,19 @@ public class TermFrequency {
     private File source;
     private File stopWords;
 
+    public static void main(String... args) throws IOException {
+        String pathToBook = new File(".").getCanonicalPath() + "/src/main/resources/pride-and-prejudice.txt";
+        String pathToStopWords = new File(".").getCanonicalPath() + "/src/main/resources/stop-words.txt";
+
+        TermFrequency termFrequency = new TermFrequency(new File(pathToBook), new File(pathToStopWords));
+        Map<String, Integer> results = termFrequency.execute();
+
+        System.out.println("Results: ");
+        for (Map.Entry<String, Integer> entry : results.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+    }
+
     public TermFrequency(File source, File stopWords) {
         this.source = source;
         this.stopWords = stopWords;
@@ -28,13 +41,13 @@ public class TermFrequency {
         List<String> wordsToOmit =
                 lineOfStopWords.map(s -> s.split(","))
                         .flatMap(Arrays::stream)
-                        .map(s -> s.toLowerCase())
+                        .map(String::toLowerCase)
                         .collect(Collectors.toList());
 
         Files.lines(Paths.get(source.getAbsolutePath()))
                 .map(s -> s.split(" "))
                 .flatMap(Arrays::stream)
-                .map(s -> s.toLowerCase())
+                .map(String::toLowerCase)
                 .filter(s -> !wordsToOmit.contains(s))
                 .forEach(s -> addToTable(wordCounts, s));
 

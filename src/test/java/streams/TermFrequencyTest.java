@@ -1,6 +1,5 @@
 package streams;
 
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,12 +10,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 public class TermFrequencyTest {
@@ -57,8 +53,15 @@ public class TermFrequencyTest {
         assertThat(wordCounts.get("of"), is(2));
     }
 
+    //TODO
+    //Tests required to drill out the following functionality:
+    // Strip punctuation from the text
+    // Strip numbers from the text
+    // Use addOrDefault when incrementing the occurrences
+
+
     private File writeStopWords() throws IOException {
-        File stopFile = temporaryFolder.newFile("stop-words.txt");
+        File stopFile = temporaryFolder.newFile("stop-words.txt.txt");
         Writer stopWordsWriter = new FileWriter(stopFile);
         stopWordsWriter.write("the,is,");
         stopWordsWriter.flush();
