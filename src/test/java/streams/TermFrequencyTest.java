@@ -16,6 +16,7 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 public class TermFrequencyTest {
@@ -23,26 +24,24 @@ public class TermFrequencyTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     private File book;
     private File stopWords;
+    private TermFrequency termFrequency;
 
     @Before
     public void setup() throws IOException {
         book = writeContentOfBook();
         stopWords = writeStopWords();
+        termFrequency = new TermFrequency(book, stopWords);
     }
 
     @Test
-    public void returnsTableOfWords() throws IOException {
-        TermFrequency termFrequency = new TermFrequency(book);
-
+    public void returnsTableOfValidWords() throws IOException {
         Collection<String> words = termFrequency.execute().keySet();
 
-        assertThat(words, containsInAnyOrder("the", "contents", "of", "is", "book", "here", "Another", "line"));
+        assertThat(words, containsInAnyOrder("contents", "of", "book", "here", "Another", "line"));
     }
 
     @Test
     public void tableDoesNotContainDuplicates() throws IOException {
-        TermFrequency termFrequency = new TermFrequency(book);
-
         Collection<String> words = termFrequency.execute().keySet();
 
         assertThat(words.stream().distinct().count(), is((long) words.size()));
@@ -50,29 +49,29 @@ public class TermFrequencyTest {
 
     @Test
     public void countsTheNumberOfTimesAWordOccurrs() throws IOException {
-        TermFrequency termFrequency = new TermFrequency(book);
-
         Map<String, Integer> wordCounts = termFrequency.execute();
 
         assertThat(wordCounts.get("Another"), is(1));
-        assertThat(wordCounts.get("the"), is(2));
+        assertThat(wordCounts.get("the"), is(nullValue()));
+        assertThat(wordCounts.get("book"), is(2));
+        assertThat(wordCounts.get("of"), is(2));
     }
 
-
     //test ideas:
-    //filter out the stop words
+    //stop word with capital letter in text
 
     private File writeStopWords() throws IOException {
         File stopFile = temporaryFolder.newFile("stop-words.txt");
         Writer stopWordsWriter = new FileWriter(stopFile);
-        stopWordsWriter.write("the, is,");
+        stopWordsWriter.write("the, is, ");
+        stopWordsWriter.flush();
         return stopFile;
     }
 
     private File writeContentOfBook() throws IOException {
         File book = temporaryFolder.newFile("source.txt");
         Writer fileWriter = new FileWriter(book);
-        fileWriter.write("the contents of the book is here\nAnother line");
+        fileWriter.write("the contents of the book is here\nAnother line of the book");
         fileWriter.flush();
         return book;
     }

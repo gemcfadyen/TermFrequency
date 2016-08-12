@@ -6,23 +6,35 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class TermFrequency {
     private File source;
+    private File stopWords;
 
-    public TermFrequency(File source) {
+    public TermFrequency(File source, File stopWords) {
         this.source = source;
+        this.stopWords = stopWords;
     }
 
     public Map<String, Integer> execute() throws IOException {
         Map<String, Integer> wordCounts = new HashMap<>();
-        Stream<String> lines = Files.lines(Paths.get(source.getAbsolutePath()));
 
-        Stream<String> wordsInLine = lines.map(s -> s.split(" ")).flatMap(Arrays::stream);
+        Stream<String> lineOfStopWords = Files.lines(Paths.get(stopWords.getAbsolutePath()));
 
-        wordsInLine.forEach(s -> addToTable(wordCounts, s));
+        List<String> wordsToOmit =
+                lineOfStopWords.map(s -> s.split(", "))
+                        .flatMap(Arrays::stream)
+                        .collect(Collectors.toList());
+
+        Files.lines(Paths.get(source.getAbsolutePath()))
+                .map(s -> s.split(" "))
+                .flatMap(Arrays::stream)
+                .filter(s -> !wordsToOmit.contains(s))
+                .forEach(s -> addToTable(wordCounts, s));
 
         return wordCounts;
     }
@@ -31,11 +43,11 @@ public class TermFrequency {
         if (!table.containsKey(word)) {
             table.put(word, 1);
         } else {
-            table.put(word, increment(table.get(word), word));
+            table.put(word, incrementOccurrancesOf(table.get(word)));
         }
     }
 
-    private int increment(Integer count, String s) {
+    private int incrementOccurrancesOf(Integer count) {
         return count + 1;
     }
 }
