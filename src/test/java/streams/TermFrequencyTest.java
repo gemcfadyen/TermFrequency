@@ -37,7 +37,7 @@ public class TermFrequencyTest {
     public void returnsTableOfValidWords() throws IOException {
         Collection<String> words = termFrequency.execute().keySet();
 
-        assertThat(words, containsInAnyOrder("contents", "of", "book", "here", "Another", "line"));
+        assertThat(words, containsInAnyOrder("contents", "of", "book", "here", "another", "line"));
     }
 
     @Test
@@ -51,19 +51,16 @@ public class TermFrequencyTest {
     public void countsTheNumberOfTimesAWordOccurrs() throws IOException {
         Map<String, Integer> wordCounts = termFrequency.execute();
 
-        assertThat(wordCounts.get("Another"), is(1));
+        assertThat(wordCounts.get("another"), is(1));
         assertThat(wordCounts.get("the"), is(nullValue()));
         assertThat(wordCounts.get("book"), is(2));
         assertThat(wordCounts.get("of"), is(2));
     }
 
-    //test ideas:
-    //stop word with capital letter in text
-
     private File writeStopWords() throws IOException {
         File stopFile = temporaryFolder.newFile("stop-words.txt");
         Writer stopWordsWriter = new FileWriter(stopFile);
-        stopWordsWriter.write("the, is, ");
+        stopWordsWriter.write("the,is,");
         stopWordsWriter.flush();
         return stopFile;
     }
@@ -71,7 +68,7 @@ public class TermFrequencyTest {
     private File writeContentOfBook() throws IOException {
         File book = temporaryFolder.newFile("source.txt");
         Writer fileWriter = new FileWriter(book);
-        fileWriter.write("the contents of the book is here\nAnother line of the book");
+        fileWriter.write("The contents of the book is here\nAnother line of the book");
         fileWriter.flush();
         return book;
     }

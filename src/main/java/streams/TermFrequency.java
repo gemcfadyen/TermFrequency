@@ -26,13 +26,15 @@ public class TermFrequency {
         Stream<String> lineOfStopWords = Files.lines(Paths.get(stopWords.getAbsolutePath()));
 
         List<String> wordsToOmit =
-                lineOfStopWords.map(s -> s.split(", "))
+                lineOfStopWords.map(s -> s.split(","))
                         .flatMap(Arrays::stream)
+                        .map(s -> s.toLowerCase())
                         .collect(Collectors.toList());
 
         Files.lines(Paths.get(source.getAbsolutePath()))
                 .map(s -> s.split(" "))
                 .flatMap(Arrays::stream)
+                .map(s -> s.toLowerCase())
                 .filter(s -> !wordsToOmit.contains(s))
                 .forEach(s -> addToTable(wordCounts, s));
 
