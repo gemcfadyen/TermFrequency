@@ -1,13 +1,12 @@
 package streams;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class TermFrequency {
@@ -17,35 +16,26 @@ public class TermFrequency {
         this.source = source;
     }
 
-    public List<String> execute() throws IOException {
-        List<String> allWords = new ArrayList<>();
-        //read in contents
-        //identify word
-        //add to list
-
+    public Map<String, Integer> execute() throws IOException {
+        Map<String, Integer> wordCounts = new HashMap<>();
         Stream<String> lines = Files.lines(Paths.get(source.getAbsolutePath()));
 
-        Stream<String> wordsInLine = lines.map(s -> {
-            return s.split(" ");
-        }).flatMap(Arrays::stream);
+        Stream<String> wordsInLine = lines.map(s -> s.split(" ")).flatMap(Arrays::stream);
 
-        wordsInLine.forEach(s -> addToTable(allWords, s));
+        wordsInLine.forEach(s -> addToTable(wordCounts, s));
 
-
-//                .forEach(s -> allWords.contains(s) ? null : allWords.add(s));
-//                .forEach(s -> allWords.addAll(Arrays));
-//                .map(s -> allWords.addAll(Arrays.asList(s.split(" ")))).distinct();
-
-        return allWords;
+        return wordCounts;
     }
 
-    private void addToTable(List<String> table, String s) {
-        if(!table.contains(s)) {
-            table.add(s);
+    private void addToTable(Map<String, Integer> table, String word) {
+        if (!table.containsKey(word)) {
+            table.put(word, 1);
+        } else {
+            table.put(word, increment(table.get(word), word));
         }
     }
 
-    private Function<String, String[]> separateWords(String line) {
-        return s -> s.split(" ");
+    private int increment(Integer count, String s) {
+        return count + 1;
     }
 }

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
@@ -33,7 +34,7 @@ public class TermFrequencyTest {
     public void returnsTableOfWords() throws IOException {
         TermFrequency termFrequency = new TermFrequency(book);
 
-        List<String> words = termFrequency.execute();
+        Collection<String> words = termFrequency.execute().keySet();
 
         assertThat(words, containsInAnyOrder("the", "contents", "of", "is", "book", "here", "Another", "line"));
     }
@@ -42,14 +43,24 @@ public class TermFrequencyTest {
     public void tableDoesNotContainDuplicates() throws IOException {
         TermFrequency termFrequency = new TermFrequency(book);
 
-        Collection<String> words = termFrequency.execute();
+        Collection<String> words = termFrequency.execute().keySet();
 
         assertThat(words.stream().distinct().count(), is((long) words.size()));
     }
 
+    @Test
+    public void countsTheNumberOfTimesAWordOccurrs() throws IOException {
+        TermFrequency termFrequency = new TermFrequency(book);
+
+        Map<String, Integer> wordCounts = termFrequency.execute();
+
+        assertThat(wordCounts.get("Another"), is(1));
+        assertThat(wordCounts.get("the"), is(2));
+    }
+
+
     //test ideas:
-    //reads more than one line
-    //counts the number of times the word has occurred
+    //filter out the stop words
 
     private File writeStopWords() throws IOException {
         File stopFile = temporaryFolder.newFile("stop-words.txt");
