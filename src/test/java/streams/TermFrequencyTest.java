@@ -1,5 +1,6 @@
 package streams;
 
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class TermFrequencyTest {
 
         List<String> words = termFrequency.execute();
 
-        assertThat(words, containsInAnyOrder("the", "contents", "of", "is", "book", "here"));
+        assertThat(words, containsInAnyOrder("the", "contents", "of", "is", "book", "here", "Another", "line"));
     }
 
     @Test
@@ -46,6 +47,10 @@ public class TermFrequencyTest {
         assertThat(words.stream().distinct().count(), is((long) words.size()));
     }
 
+    //test ideas:
+    //reads more than one line
+    //counts the number of times the word has occurred
+
     private File writeStopWords() throws IOException {
         File stopFile = temporaryFolder.newFile("stop-words.txt");
         Writer stopWordsWriter = new FileWriter(stopFile);
@@ -56,7 +61,7 @@ public class TermFrequencyTest {
     private File writeContentOfBook() throws IOException {
         File book = temporaryFolder.newFile("source.txt");
         Writer fileWriter = new FileWriter(book);
-        fileWriter.write("the contents of the book is here\n");
+        fileWriter.write("the contents of the book is here\nAnother line");
         fileWriter.flush();
         return book;
     }
